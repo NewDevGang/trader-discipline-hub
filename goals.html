@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Goals</title>
+</head>
+<body>
+
+<header>
+    <h1>Trading Goals</h1>
+    <nav>
+        <div class="dropdown">
+            <button>Areas</button>
+            <div class="dropdown-content">
+                <a href="index.html">Home</a>
+                <a href="logs.html">Trade Logs</a>
+                <a href="resources.html">Resources</a>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<section>
+    <h2>Set Your Daily Profit Targets</h2>
+    <form id="profit">
+        <label for="target">What is today's profit target?</label><br>
+        <input type="number" id="target" name="target" placeholder="Number of Solana Made" required><br><br>
+        <label for="investment">Amount of Solana Used:</label><br>
+        <input type="number" id="investment" name="investment" placeholder="Number of Solana Used" required><br><br>
+        <label for="timer">Set Timer (minutes):</label><br>
+        <input type="number" id="timer" name="timer" min="1" required><br><br>
+        <input type="submit" value="Save Target & Start Timer">
+    </form>
+
+    <h3>Current Targets</h3>
+    <ul id="target-list">
+        <!-- Goals will be displayed here -->
+    </ul>
+
+    <h3 id="checkin-status"></h3>
+    <button id="clock-out" style="display:none;">Clock Out</button>
+
+    <!-- Actual Profit Input -->
+    <h2 id="actual-profit-section" style="display:none;">Record Your Actual Profit</h2>
+    <form id="actual-profit-form" style="display:none;">
+        <label for="actual-profit">Actual Profit Achieved:</label><br>
+        <input type="number" id="actual-profit" name="actual-profit" placeholder="Actual Profit Made" required><br><br>
+        <input type="submit" value="Record Profit">
+    </form>
+</section>
+
+<footer>
+    <p>&copy; 2024 Trader Discipline Hub. All Rights Reserved.</p>
+</footer>
+
+<script>
+    const profitForm = document.getElementById('profit');
+    const targetList = document.getElementById('target-list');
+    const checkinStatus = document.getElementById('checkin-status');
+    const clockOutButton = document.getElementById('clock-out');
+    const actualProfitForm = document.getElementById('actual-profit-form');
+    const actualProfitSection = document.getElementById('actual-profit-section');
+    let timer; // To hold the timer interval
+
+    let dailyGoal; // Variable to hold the daily goal for later use
+
+    // Function to handle profit target form submission
+    profitForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const targetInput = document.getElementById('target');
+        const investmentInput = document.getElementById('investment');
+        const timerInput = document.getElementById('timer');
+
+        // Get the input values
+        const target = targetInput.value; // Get the value of the target input
+        const investment = investmentInput.value; // Get the value of the investment input
+
+        const duration = timerInput.value * 60; // Convert minutes to seconds
+        let timeRemaining = duration;
+
+        // Update the status
+        checkinStatus.textContent = `Profit Target: ${target} | Time Remaining: ${timeRemaining} seconds`;
+        clockOutButton.style.display = 'inline-block';
+        actualProfitSection.style.display = 'none'; // Hide the actual profit section initially
+
+        // Start the timer
+        timer = setInterval(function() {
+            timeRemaining--;
+            checkinStatus.textContent = `Profit Target: ${target} | Time Remaining: ${timeRemaining} seconds`;
+
+            if (timeRemaining <= 0) {
+                clearInterval(timer);
+                checkinStatus.textContent = `Time's up! Please record your actual profit.`;
+                actualProfitSection.style.display = 'block'; // Show the actual profit section
+                actualProfitForm.style.display = 'block'; // Show the actual profit form
+                clockOutButton.style.display = 'inline-block';
+            }
+        }, 1000); // Update every second
+
+        // Clear input fields
+        targetInput.value = '';
+        investmentInput.value = '';
+        timerInput.value = ''; // Reset timer input as well
+    });
+
+    // Function to handle actual profit recording
+    actualProfitForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const actualProfitInput = document.getElementById('actual-profit');
+
+        const listItem = document.createElement('li');
+        listItem.textContent = `Target: ${document.getElementById('target').value} Solana | Investment: ${document.getElementById('investment').value} Solana | Actual Profit: ${actualProfitInput.value} Solana | Daily Goal: ${dailyGoal}`;
+        targetList.appendChild(listItem);
+
+        // Reset the form
+        actualProfitInput.value = '';
+        actualProfitSection.style.display = 'none'; // Hide the actual profit section
+        clockOutButton.style.display = 'none'; // Hide clock out button
+        checkinStatus.textContent = ''; // Clear status message
+    });
+
+    // Function to handle clock out
+    clockOutButton.addEventListener('click', function() {
+        checkinStatus.textContent = `You clocked out after achieving: ${dailyGoal}`;
+        clearInterval(timer); // Clear the timer if clocking out
+    });
+</script>
+
+</body>
+</html>
